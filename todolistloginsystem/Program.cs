@@ -21,7 +21,7 @@ namespace todolistloginsystem
             {
                 Console.Write("Enter your PIN: ");
                 pin = Console.ReadLine();
-                if (pin != ToDoListManager.PinCode) // Now using PinCode from ToDoListManager
+                if (pin != ToDoListManager.PinCode) // calling pincode from ToDoListManager which nadeclare ko na sya sa businessData
                     Console.WriteLine("Incorrect PIN! Please try again.");
             } while (pin != ToDoListManager.PinCode); // Loop until the correct PIN is entered
 
