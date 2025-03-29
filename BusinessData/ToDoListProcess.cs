@@ -6,10 +6,11 @@ namespace ToDoListProcess
     public class ToDoListManager
     {
         private List<string> tasks = new List<string>(); // Stores all tasks
+        public static string PinCode { get; } = "2004";
 
         public List<string> GetTasks()
         {
-            return new List<string>(tasks); 
+            return new List<string>(tasks);
         }
 
         public void AddTask(string task) //method for adding a task
@@ -37,7 +38,7 @@ namespace ToDoListProcess
             return false;
         }
 
-        public bool MarkAsDone(int index) 
+        public bool MarkAsDone(int index)
         {
             if (IsValidIndex(index))
             {
@@ -47,7 +48,7 @@ namespace ToDoListProcess
             return false;
         }
 
-        private bool IsValidIndex(int index) 
+        private bool IsValidIndex(int index)
         {
             return index > 0 && index <= tasks.Count;
         }

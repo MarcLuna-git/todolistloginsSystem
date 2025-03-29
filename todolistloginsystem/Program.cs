@@ -5,7 +5,6 @@ namespace todolistloginsystem
 {
     internal class Program
     {
-        static string pinCode = "2004";
         static ToDoListManager toDoList = new ToDoListManager(); // calling Task Manager in business and data logic
 
         //UI LOGIC
@@ -16,15 +15,15 @@ namespace todolistloginsystem
             Console.Write("Enter your Name: ");
             string name = Console.ReadLine();
 
-            
+
             string pin;
             do
             {
                 Console.Write("Enter your PIN: ");
                 pin = Console.ReadLine();
-                if (pin != pinCode)
+                if (pin != ToDoListManager.PinCode) // Now using PinCode from ToDoListManager
                     Console.WriteLine("Incorrect PIN! Please try again.");
-            } while (pin != pinCode); // Loop until the correct PIN is entered
+            } while (pin != ToDoListManager.PinCode); // Loop until the correct PIN is entered
 
             Console.WriteLine($"Welcome {name}, To: To-Do List System!");
             ShowMenu();
@@ -82,16 +81,16 @@ namespace todolistloginsystem
             else Console.WriteLine("Invalid input.");
         }
 
-        static void DeleteTask() 
+        static void DeleteTask()
         {
-            DisplayTasks(); 
+            DisplayTasks();
             Console.Write("Enter Task Number to Delete: ");
             if (int.TryParse(Console.ReadLine(), out int index))
                 Console.WriteLine(toDoList.DeleteTask(index) ? "Task deleted successfully!" : "Invalid task number.");
             else Console.WriteLine("Invalid input.");
         }
 
-        static void MarkAsDone() 
+        static void MarkAsDone()
         {
             DisplayTasks();
             Console.Write("Enter Task Number to Mark as Done: ");
