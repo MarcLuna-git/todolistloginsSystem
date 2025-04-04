@@ -5,24 +5,30 @@ namespace ToDoListProcess
 {
     public class ToDoListManager
     {
-        private List<string> tasks = new List<string>(); // Stores all tasks
+        private List<(string Task, DateTime DateAndTime)> tasks = new List<(string, DateTime)>(); //storing task with Date and Time
         public static string PinCode { get; } = "2004";
 
         public List<string> GetTasks()
         {
-            return new List<string>(tasks);
+            List<string> taskList = new List<string>();
+            foreach (var task in tasks)
+            {
+                taskList.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
+            }
+            return taskList;
         }
 
-        public void AddTask(string task) //method for adding a task
+        public void AddTask(string task) // Method for adding a task
         {
-            tasks.Add(task);
+            tasks.Add((task, DateTime.Now));
         }
 
         public bool EditTask(int index, string newDescription)
         {
             if (IsValidIndex(index))
             {
-                tasks[index - 1] = newDescription;
+                var DateTime = tasks[index - 1].DateAndTime; 
+                tasks[index - 1] = (newDescription, DateTime);
                 return true;
             }
             return false;
@@ -42,7 +48,8 @@ namespace ToDoListProcess
         {
             if (IsValidIndex(index))
             {
-                tasks[index - 1] = "√ " + tasks[index - 1];
+                var (task, timestamp) = tasks[index - 1];
+                tasks[index - 1] = ($"[√] {task}", timestamp);
                 return true;
             }
             return false;
