@@ -1,13 +1,11 @@
 ﻿using System;
-using ToDoListProcess;
-
-namespace todolistloginsystem
+using ToDoListProcess.BL;  //business logic
+namespace ToDoListLoginSystem
 {
     internal class Program
     {
-        static ToDoListManager toDoList = new ToDoListManager(); // calling Task Manager in business and data logic
+        static ToDoListManager toDoList = new ToDoListManager(); // calling BL
 
-        //UI LOGIC
         static void Main(string[] args)
         {
             Console.WriteLine("=== Welcome to Your To-Do List ===");
@@ -15,26 +13,24 @@ namespace todolistloginsystem
             Console.Write("Enter your Name: ");
             string name = Console.ReadLine();
 
-
             string pin;
             do
             {
                 Console.Write("Enter your PIN: ");
                 pin = Console.ReadLine();
-                if (pin != ToDoListManager.PinCode) 
+                if (pin != ToDoListManager.PinCode)
                     Console.WriteLine("Incorrect PIN! Please try again.");
-            } while (pin != ToDoListManager.PinCode); // Loop until the correct PIN is entered
+            } while (pin != ToDoListManager.PinCode);
 
             Console.WriteLine($"Welcome {name}, To: To-Do List System!");
             ShowMenu();
         }
-
-        static void ShowMenu() //shows menu options
+        static void ShowMenu()
         {
             while (true)
             {
                 Console.WriteLine("\nChoices: ");
-                Console.WriteLine("1. View Tasks\n2. Add Task\n3. Edit Task\n4. Delete Task\n5. Mark as Done\n6. Exit");
+                Console.WriteLine("1. View Tasks\n2. Add Task\n3. Edit Task\n4. Delete Task\n5. Mark as Done\n6. Search Task\n7. Exit");
                 Console.Write("Choose a number: ");
 
                 switch (Console.ReadLine())
@@ -44,17 +40,17 @@ namespace todolistloginsystem
                     case "3": EditTask(); break;
                     case "4": DeleteTask(); break;
                     case "5": MarkAsDone(); break;
-                    case "6":
+                    case "6": SearchTask(); break;
+                    case "7":
                         Console.WriteLine("Thank you for using the To-Do List System!");
                         return;
                     default:
-                        Console.WriteLine("Invalid input! Please choose between 1-6.");
+                        Console.WriteLine("Invalid input! Please choose between 1-7.");
                         break;
                 }
             }
         }
-
-        static void DisplayTasks() //displaying task
+        static void DisplayTasks()
         {
             var tasks = toDoList.GetTasks();
             Console.WriteLine(tasks.Count == 0 ? "No tasks available! Add one to get started." : "Your Current Tasks:");
@@ -66,37 +62,102 @@ namespace todolistloginsystem
         {
             Console.Write("Enter Task: ");
             toDoList.AddTask(Console.ReadLine());
-            Console.WriteLine("Task added");
+            Console.WriteLine("Task added successfully.");
         }
-
         static void EditTask()
         {
-            DisplayTasks();
+            DisplayTasks(); 
             Console.Write("Enter Task Number to Edit: ");
+
             if (int.TryParse(Console.ReadLine(), out int index))
             {
-                Console.Write(" Enter new task description: ");
-                Console.WriteLine(toDoList.EditTask(index, Console.ReadLine()) ? "Task updated successfully!" : "Invalid task number.");
-            }
-            else Console.WriteLine("Invalid input.");
-        }
+                index -= 1;
 
+                if (index >= 0 && index < toDoList.GetTasks().Count)
+                {
+                    Console.Write("Enter new task description: ");
+                    string newDescription = Console.ReadLine();
+                    bool success = toDoList.EditTask(index, newDescription);
+                    Console.WriteLine(success ? "Task updated successfully!" : "Failed to update task.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid task number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
+        }
         static void DeleteTask()
         {
-            DisplayTasks();
+            DisplayTasks(); 
             Console.Write("Enter Task Number to Delete: ");
-            if (int.TryParse(Console.ReadLine(), out int index))
-                Console.WriteLine(toDoList.DeleteTask(index) ? "Task deleted successfully!" : "Invalid task number.");
-            else Console.WriteLine("Invalid input.");
-        }
 
+            if (int.TryParse(Console.ReadLine(), out int index))
+            {
+                index -= 1;
+
+                if (index >= 0 && index < toDoList.GetTasks().Count)
+                {
+                    bool success = toDoList.DeleteTask(index);
+                    Console.WriteLine(success ? "Task deleted successfully!" : "Failed to delete task.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid task number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
+        }
         static void MarkAsDone()
         {
             DisplayTasks();
             Console.Write("Enter Task Number to Mark as Done: ");
+
             if (int.TryParse(Console.ReadLine(), out int index))
-                Console.WriteLine(toDoList.MarkAsDone(index) ? "√ Task marked as done." : "Invalid task number.");
-            else Console.WriteLine("Invalid input.");
+            {
+                index -= 1; 
+
+                if (index >= 0 && index < toDoList.GetTasks().Count)
+                {
+                    bool success = toDoList.MarkAsDone(index); 
+                    Console.WriteLine(success ? "√ Task marked as done." : "Failed to mark task as done.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid task number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
+        }
+
+        static void SearchTask()
+        {
+            Console.Write("Enter keyword to search for a task: ");
+            string keyword = Console.ReadLine();
+
+            var tasks = toDoList.SearchTasks(keyword);
+
+            if (tasks.Count > 0)
+            {
+                Console.WriteLine("Search Results:");
+                foreach (var task in tasks)
+                {
+                    Console.WriteLine(task);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No tasks found matching the keyword.");
+            }
         }
     }
 }
