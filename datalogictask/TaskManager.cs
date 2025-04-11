@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ToDoListProcess.Common;
 
 namespace ToDoListProcess.DL
 {
     public class TaskManager
     {
-        private List<TaskItem> tasks = new List<TaskItem>(); // List of tasks
+        private List<TaskItem> tasks = new List<TaskItem>();
 
-        // Get all tasks
         public List<TaskItem> GetAllTasks()
         {
             return tasks;
         }
+
         public void AddTask(string taskDescription)
         {
             tasks.Add(new TaskItem(taskDescription));
@@ -49,17 +49,15 @@ namespace ToDoListProcess.DL
 
         public List<TaskItem> SearchTasks(string keyword)
         {
-            List<TaskItem> searchResults = new List<TaskItem>();
-
+            List<TaskItem> result = new List<TaskItem>();
             foreach (var task in tasks)
             {
                 if (task.Task.ToLower().Contains(keyword.ToLower()))
                 {
-                    searchResults.Add(task);
+                    result.Add(task);
                 }
             }
-
-            return searchResults;
+            return result;
         }
     }
 }

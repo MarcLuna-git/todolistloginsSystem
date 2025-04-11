@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todolist_BusinessLogic", "B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todolist_DataLogic", "datalogictask\todolist_DataLogic.csproj", "{61B737D5-527A-4292-919C-D8ACC99A62FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todolist_Common", "todolist_Common\todolist_Common.csproj", "{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{61B737D5-527A-4292-919C-D8ACC99A62FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61B737D5-527A-4292-919C-D8ACC99A62FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61B737D5-527A-4292-919C-D8ACC99A62FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
