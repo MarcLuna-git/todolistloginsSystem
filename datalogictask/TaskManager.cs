@@ -9,9 +9,9 @@ namespace ToDoListProcess.DL
 
         private readonly Dictionary<string, string> accounts = new Dictionary<string, string>
         {
-            { "Luna", "1234" },
-            { "Marie", "0924" },
-            { "Jasmine", "1111" }
+            { "Marc", "1234" },
+            { "Laurence", "2004" },
+            { "Luna", "0924" }
         };
 
         public bool ValidateAccount(string username, string password)

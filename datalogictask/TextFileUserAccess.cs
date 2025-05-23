@@ -22,9 +22,9 @@ namespace ToDoListProcess.DL
             {
                 users = new List<Account>
                 {
-                    new Account("alice", "1234"),
-                    new Account("bob", "5678"),
-                    new Account("charlie", "abcd")
+                    new Account("Marc", "1234"),
+                    new Account("Laurence", "2004"),
+                    new Account("Luna", "0924")
                 };
                 SaveUsersToFile();
                 return;
