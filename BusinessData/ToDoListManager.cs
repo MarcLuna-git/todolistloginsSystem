@@ -1,66 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using ToDoListProcess.DL;
+﻿using System.Collections.Generic;
+using ToDoListProcess.Common;
 
 namespace ToDoListProcess.BL
 {
     public class ToDoListManager
     {
-        private TaskManager taskManager;
+        private readonly ITaskData taskData;
 
-        public ToDoListManager()
+        public ToDoListManager(ITaskData dataSource)
         {
-            taskManager = new TaskManager();
-        }
-
-        public bool ValidateLogin(string username, string password)
-        {
-            return taskManager.ValidateAccount(username, password);
+            taskData = dataSource;
         }
 
         public List<string> GetTasks()
         {
-            var tasks = taskManager.GetAllTasks();
+            var tasks = taskData.GetAllTasks();
             List<string> taskList = new List<string>();
-
             foreach (var task in tasks)
             {
                 taskList.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
             }
-
             return taskList;
         }
 
         public void AddTask(string taskDescription)
         {
-            taskManager.AddTask(taskDescription);
+            taskData.AddTask(taskDescription);
         }
 
         public bool EditTask(int index, string newDescription)
         {
-            return taskManager.EditTask(index, newDescription);
+            return taskData.EditTask(index, newDescription);
         }
 
         public bool DeleteTask(int index)
         {
-            return taskManager.DeleteTask(index);
+            return taskData.DeleteTask(index);
         }
 
         public bool MarkAsDone(int index)
         {
-            return taskManager.MarkAsDone(index);
+            return taskData.MarkAsDone(index);
         }
 
         public List<string> SearchTasks(string keyword)
         {
-            var tasks = taskManager.SearchTasks(keyword);
+            var tasks = taskData.SearchTasks(keyword);
             List<string> formattedResults = new List<string>();
-
             foreach (var task in tasks)
             {
                 formattedResults.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
             }
-
             return formattedResults;
         }
     }

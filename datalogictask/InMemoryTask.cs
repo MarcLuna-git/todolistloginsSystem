@@ -3,21 +3,9 @@ using ToDoListProcess.Common;
 
 namespace ToDoListProcess.DL
 {
-    public class TaskManager
+    public class InMemoryTask : ITaskData
     {
         private List<TaskItem> tasks = new List<TaskItem>();
-
-        private readonly Dictionary<string, string> accounts = new Dictionary<string, string>
-        {
-            { "Marc", "1234" },
-            { "Laurence", "2004" },
-            { "Luna", "0924" }
-        };
-
-        public bool ValidateAccount(string username, string password)
-        {
-            return accounts.ContainsKey(username) && accounts[username] == password;
-        }
 
         public List<TaskItem> GetAllTasks()
         {

@@ -11,13 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todolist_DataLogic", "datal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todolist_Common", "todolist_Common\todolist_Common.csproj", "{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
-	ProjectSection(SolutionItems) = preProject
-		user.txt = user.txt
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "todo_Desktop", "todo_Desktop\todo_Desktop.csproj", "{D4C309E1-7253-4EEB-990C-C09D3CA11502}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,10 +33,6 @@ Global
 		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8AA05C3-B453-40C7-92AC-B79BAF6FE064}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4C309E1-7253-4EEB-990C-C09D3CA11502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4C309E1-7253-4EEB-990C-C09D3CA11502}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4C309E1-7253-4EEB-990C-C09D3CA11502}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4C309E1-7253-4EEB-990C-C09D3CA11502}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
