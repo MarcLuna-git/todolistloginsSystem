@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ToDoListProcess.DL;  // Data Logic
+using ToDoListProcess.DL;
 
 namespace ToDoListProcess.BL
 {
@@ -8,11 +8,14 @@ namespace ToDoListProcess.BL
     {
         private TaskManager taskManager;
 
-        public static string PinCode { get; } = "2004";  // Static PinCode for validation
-
         public ToDoListManager()
         {
-            taskManager = new TaskManager();  // Calling the DL 
+            taskManager = new TaskManager();
+        }
+
+        public bool ValidateLogin(string username, string password)
+        {
+            return taskManager.ValidateAccount(username, password);
         }
 
         public List<string> GetTasks()
