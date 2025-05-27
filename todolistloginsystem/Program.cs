@@ -7,17 +7,37 @@ namespace ToDoListLoginSystem
 {
     internal class Program
     {
-        static ToDoListManager toDoList = new ToDoListManager(new InMemoryTask()); // Switchable sya to JsonFileTask or TextFileTask
+        
+        private static readonly ToDoListManager toDoList = new(new TextFileTask());
+        private static readonly UserManager userManager = new();
 
-        static void Main(string[] args)
+        static void Main(string[] _) 
         {
             Console.WriteLine("=== Welcome to Your To-Do List Login System ===");
+            if (Login())
+            {
+                ShowMenu();
+            }
+            else
+            {
+                Console.WriteLine("Invalid username or password. Exiting...");
+            }
+        }
 
-            Console.Write("Enter your Name: ");
-            string name = Console.ReadLine();
+        static bool Login()
+        {
+            Console.Write("Enter your Username: ");
+            string? username = Console.ReadLine();
+            Console.Write("Enter your Password: ");
+            string? password = Console.ReadLine();
 
-            Console.WriteLine($"Welcome {name}, To: To-Do List System!");
-            ShowMenu();
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("Username and password cannot be empty.");
+                return false;
+            }
+
+            return userManager.Authenticate(username, password);
         }
 
         static void ShowMenu()
@@ -57,7 +77,13 @@ namespace ToDoListLoginSystem
         static void AddTask()
         {
             Console.Write("Enter Task: ");
-            toDoList.AddTask(Console.ReadLine());
+            string? taskDescription = Console.ReadLine();
+            if (string.IsNullOrEmpty(taskDescription))
+            {
+                Console.WriteLine("Task description cannot be empty.");
+                return;
+            }
+            toDoList.AddTask(taskDescription);
             Console.WriteLine("Task added successfully.");
         }
 
@@ -69,7 +95,12 @@ namespace ToDoListLoginSystem
             {
                 index -= 1;
                 Console.Write("Enter new task description: ");
-                string newDescription = Console.ReadLine();
+                string? newDescription = Console.ReadLine();
+                if (string.IsNullOrEmpty(newDescription))
+                {
+                    Console.WriteLine("New task description cannot be empty.");
+                    return;
+                }
                 Console.WriteLine(toDoList.EditTask(index, newDescription) ? "Task updated successfully!" : "Failed to update task.");
             }
             else Console.WriteLine("Invalid input.");
@@ -102,7 +133,13 @@ namespace ToDoListLoginSystem
         static void SearchTask()
         {
             Console.Write("Enter keyword to search for a task: ");
-            var tasks = toDoList.SearchTasks(Console.ReadLine());
+            string? keyword = Console.ReadLine();
+            if (string.IsNullOrEmpty(keyword))
+            {
+                Console.WriteLine("Search keyword cannot be empty.");
+                return;
+            }
+            var tasks = toDoList.SearchTasks(keyword);
             if (tasks.Count > 0)
                 foreach (var task in tasks) Console.WriteLine(task);
             else Console.WriteLine("No tasks found matching the keyword.");

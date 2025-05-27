@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessData\todolist_BusinessLogic.csproj" />
+    <ProjectReference Include="..\datalogictask\todolist_DataLogic.csproj" />
   </ItemGroup>
 
 </Project>
