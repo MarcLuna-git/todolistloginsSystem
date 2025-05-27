@@ -14,9 +14,8 @@ namespace ToDoListProcess.DL
         {
             if (!File.Exists(filePath))
                 return new List<TaskItem>();
-
             string json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<List<TaskItem>>(json);
+            return JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new();
         }
 
         public void AddTask(string taskDescription)
@@ -55,7 +54,8 @@ namespace ToDoListProcess.DL
             var tasks = GetAllTasks();
             if (index >= 0 && index < tasks.Count)
             {
-                tasks[index].Task = "[\u221A] " + tasks[index].Task;
+                if (!tasks[index].Task.StartsWith("[√]"))
+                    tasks[index].Task = "[√] " + tasks[index].Task;
                 SaveAllTasks(tasks);
                 return true;
             }
@@ -64,15 +64,13 @@ namespace ToDoListProcess.DL
 
         public List<TaskItem> SearchTasks(string keyword)
         {
-            List<TaskItem> result = new List<TaskItem>();
+            var results = new List<TaskItem>();
             foreach (var task in GetAllTasks())
             {
                 if (task.Task.ToLower().Contains(keyword.ToLower()))
-                {
-                    result.Add(task);
-                }
+                    results.Add(task);
             }
-            return result;
+            return results;
         }
 
         private void SaveAllTasks(List<TaskItem> tasks)

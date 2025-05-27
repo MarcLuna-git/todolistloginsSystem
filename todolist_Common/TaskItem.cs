@@ -4,13 +4,12 @@ namespace ToDoListProcess.Common
 {
     public class TaskItem
     {
-        public int Id { get; set; }
         public string Task { get; set; }
         public DateTime DateAndTime { get; set; }
 
-        public TaskItem(string taskDescription)
+        public TaskItem(string task)
         {
-            Task = taskDescription;
+            Task = task;
             DateAndTime = DateTime.Now;
         }
     }

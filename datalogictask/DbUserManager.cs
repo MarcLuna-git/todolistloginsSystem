@@ -1,47 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using todolist_Common;
+using Microsoft.Data.SqlClient;
+using ToDoListProcess.Common;
 
-namespace DataLogicLayer
+namespace ToDoListProcess.DL
 {
     public class DbUserManager
     {
-        private readonly string _connectionString;
+        private static string connectionString =
+            "Data Source=DESKTOP-53PHH4Q;Initial Catalog=DBTaskData;Integrated Security=True;TrustServerCertificate=True;";
 
-        public DbUserManager(string connectionString)
+        private readonly SqlConnection sqlConnection;
+
+        public DbUserManager()
         {
-            _connectionString = connectionString;
+            sqlConnection = new SqlConnection(connectionString);
         }
 
-        public UserModel Authenticate(string username, string password)
+        
+        public List<string> GetAllUsers()
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            var users = new List<string>();
+            string selectStatement = "SELECT Username FROM Users"; 
+
+            SqlCommand command = new SqlCommand(selectStatement, sqlConnection);
+            sqlConnection.Open();
+            SqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
             {
-                conn.Open();
-
-                string query = "SELECT * FROM Users WHERE Username = @Username AND Password = @Password";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Username", username);
-                    cmd.Parameters.AddWithValue("@Password", password);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new UserModel
-                            {
-                                UserID = Convert.ToInt32(reader["UserID"]),
-                                Username = reader["Username"].ToString(),
-                                Password = reader["Password"].ToString()
-                            };
-                        }
-                    }
-                }
+                users.Add(reader["Username"].ToString());
             }
 
-            return null; // mag return null sya if yung user is hindi makita or wrong yung password nya
+            sqlConnection.Close();
+            return users;
         }
+
     }
 }

@@ -3,15 +3,16 @@ using ToDoListProcess.BL;
 using ToDoListProcess.Common;
 using ToDoListProcess.DL;
 
+
+
 namespace ToDoListLoginSystem
 {
     internal class Program
     {
-        
-        private static readonly ToDoListManager toDoList = new(new TextFileTask());
+        private static readonly ToDoListManager toDoList = new(new JsonFileTask()); 
         private static readonly UserManager userManager = new();
 
-        static void Main(string[] _) 
+        static void Main(string[] _)
         {
             Console.WriteLine("=== Welcome to Your To-Do List Login System ===");
             if (Login())
@@ -37,8 +38,25 @@ namespace ToDoListLoginSystem
                 return false;
             }
 
-            return userManager.Authenticate(username, password);
+            var result = userManager.Authenticate(username, password);
+            switch (result)
+            {
+                case LoginStatus.Success:
+                    Console.WriteLine($"Hello {username}, welcome to the To-Do List Login System!");
+                    return true;
+
+                case LoginStatus.UserNotFound:
+                    Console.WriteLine("Username not found.");
+                    return false;
+
+                case LoginStatus.WrongPassword:
+                    Console.WriteLine("Your password is incorrect.");
+                    return false;
+            }
+
+            return false;
         }
+
 
         static void ShowMenu()
         {
