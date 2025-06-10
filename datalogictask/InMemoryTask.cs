@@ -1,63 +1,91 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ToDoListProcess.Common;
 
 namespace ToDoListProcess.DL
 {
     public class InMemoryTask : ITaskData
     {
-        private List<TaskItem> tasks = new List<TaskItem>();
+        private readonly List<TaskItem> tasks = new();
 
-        public List<TaskItem> GetAllTasks()
+        public List<TaskItem> GetAllTasks(string user)
         {
-            return tasks;
-        }
-
-        public void AddTask(string taskDescription)
-        {
-            tasks.Add(new TaskItem(taskDescription));
-        }
-
-        public bool EditTask(int index, string newDescription)
-        {
-            if (index >= 0 && index < tasks.Count)
-            {
-                tasks[index].Task = newDescription;
-                return true;
-            }
-            return false;
-        }
-
-        public bool DeleteTask(int index)
-        {
-            if (index >= 0 && index < tasks.Count)
-            {
-                tasks.RemoveAt(index);
-                return true;
-            }
-            return false;
-        }
-
-        public bool MarkAsDone(int index)
-        {
-            if (index >= 0 && index < tasks.Count)
-            {
-                tasks[index].Task = "[√] " + tasks[index].Task;
-                return true;
-            }
-            return false;
-        }
-
-        public List<TaskItem> SearchTasks(string keyword)
-        {
-            List<TaskItem> result = new List<TaskItem>();
+            var userTasks = new List<TaskItem>();
             foreach (var task in tasks)
             {
-                if (task.Task.ToLower().Contains(keyword.ToLower()))
+                if (task.User == user)
                 {
-                    result.Add(task);
+                    userTasks.Add(task);
                 }
             }
-            return result;
+            return userTasks;
+        }
+
+        public void AddTask(string user, string taskDescription)
+        {
+            tasks.Add(new TaskItem(user, taskDescription, DateTime.Now));
+        }
+
+        public bool EditTask(int index, string newDescription, string user)
+        {
+            var userTasks = GetAllTasks(user);
+            if (index >= 0 && index < userTasks.Count)
+            {
+                var taskToEdit = userTasks[index];
+                // Gamitin ang index mula sa original list para mapalitan ang task
+                int originalIndex = tasks.IndexOf(taskToEdit);
+                if (originalIndex != -1)
+                {
+                    // Gumawa ng bagong task at palitan sa list
+                    var updatedTask = new TaskItem(user, newDescription, tasks[originalIndex].DateAndTime);
+                    tasks[originalIndex] = updatedTask;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool DeleteTask(int index, string user)
+        {
+            var userTasks = GetAllTasks(user);
+            if (index >= 0 && index < userTasks.Count)
+            {
+                var taskToRemove = userTasks[index];
+                tasks.Remove(taskToRemove);
+                return true;
+            }
+            return false;
+        }
+
+        public bool MarkAsDone(int index, string user)
+        {
+            var userTasks = GetAllTasks(user);
+            if (index >= 0 && index < userTasks.Count)
+            {
+                var task = userTasks[index];
+                int originalIndex = tasks.IndexOf(task);
+                if (originalIndex != -1 && !tasks[originalIndex].Task.StartsWith("[√] "))
+                {
+                    var completedTask = new TaskItem(user, "[√] " + task.Task, task.DateAndTime);
+                    tasks[originalIndex] = completedTask;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public List<TaskItem> SearchTasks(string keyword, string user)
+        {
+            var results = new List<TaskItem>();
+            foreach (var task in tasks)
+            {
+                if (task.User == user && task.Task.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(task);
+                }
+            }
+            return results;
         }
     }
 }

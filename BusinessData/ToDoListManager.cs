@@ -1,42 +1,52 @@
 ﻿using System.Collections.Generic;
 using ToDoListProcess.Common;
 
-namespace ToDoListProcess.BL
+namespace ToDoListProcess.Business
 {
-    public class ToDoListManager
+    public class ToDoListManager(ITaskData taskData)
     {
-        private readonly ITaskData taskData;
+        private readonly ITaskData _taskData = taskData;
 
-        public ToDoListManager(ITaskData dataSource)
+        public List<string> GetTasks(string username)
         {
-            taskData = dataSource;
-        }
-
-        public List<string> GetTasks()
-        {
-            var tasks = taskData.GetAllTasks();
-            List<string> taskList = new();
+            var tasks = _taskData.GetAllTasks(username); // Pass username here
+            var list = new List<string>();
             foreach (var task in tasks)
             {
-                taskList.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
+                list.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
             }
-            return taskList;
+            return list;
         }
 
-        public void AddTask(string taskDescription) => taskData.AddTask(taskDescription);
-        public bool EditTask(int index, string newDescription) => taskData.EditTask(index, newDescription);
-        public bool DeleteTask(int index) => taskData.DeleteTask(index);
-        public bool MarkAsDone(int index) => taskData.MarkAsDone(index);
-
-        public List<string> SearchTasks(string keyword)
+        public void AddTask(string user, string taskDescription)
         {
-            var tasks = taskData.SearchTasks(keyword);
-            List<string> results = new();
+            _taskData.AddTask(user, taskDescription);
+        }
+
+        public bool EditTask(int index, string newDescription, string username)
+        {
+            return _taskData.EditTask(index, newDescription, username);
+        }
+
+        public bool DeleteTask(int index, string username)
+        {
+            return _taskData.DeleteTask(index, username);
+        }
+
+        public bool MarkAsDone(int index, string username)
+        {
+            return _taskData.MarkAsDone(index, username);
+        }
+
+        public List<string> SearchTasks(string keyword, string username)
+        {
+            var tasks = _taskData.SearchTasks(keyword, username);
+            var list = new List<string>();
             foreach (var task in tasks)
             {
-                results.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
+                list.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
             }
-            return results;
+            return list;
         }
     }
 }

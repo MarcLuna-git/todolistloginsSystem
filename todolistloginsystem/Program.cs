@@ -1,72 +1,107 @@
 ﻿using System;
 using ToDoListProcess.BL;
+using ToDoListProcess.Business;
 using ToDoListProcess.Common;
-using ToDoListProcess.DL;
+using ToDoListProcess.Data;
 
-
-
-namespace ToDoListLoginSystem
+namespace ToDoListUI
 {
     internal class Program
     {
-        private static readonly ToDoListManager toDoList = new(new JsonFileTask()); 
-        private static readonly UserManager userManager = new();
+        static string? currentUser = null;
+
+        // Change to your preferred data layer implementation
+        static readonly ITaskData taskData = new JsonFileTask();
+        static readonly ToDoListManager toDoList = new(taskData);
+        static readonly UserManager userManager = new();
 
         static void Main(string[] _)
         {
-            Console.WriteLine("=== Welcome to Your To-Do List Login System ===");
-            if (Login())
+            Console.WriteLine("=== Welcome to Your To-Do List System ===");
+            Console.WriteLine("1. Login\n2. Register");
+            Console.Write("Choose an option: ");
+            string? choice = Console.ReadLine();
+
+            if (choice == "1")
             {
-                ShowMenu();
+                if (Login())
+                    ShowMenu();
+                else
+                    Console.WriteLine("Invalid login. Exiting...");
+            }
+            else if (choice == "2")
+            {
+                Register();
+                Console.WriteLine("You can now log in.");
+                if (Login())
+                    ShowMenu();
+                else
+                    Console.WriteLine("Invalid login after registration.");
             }
             else
             {
-                Console.WriteLine("Invalid username or password. Exiting...");
+                Console.WriteLine("Invalid choice. Exiting...");
             }
         }
 
         static bool Login()
         {
-            Console.Write("Enter your Username: ");
+            Console.Write("Enter Username: ");
             string? username = Console.ReadLine();
-            Console.Write("Enter your Password: ");
+
+            Console.Write("Enter Password: ");
             string? password = Console.ReadLine();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                Console.WriteLine("Username and password cannot be empty.");
+                Console.WriteLine("Username or password cannot be empty.");
                 return false;
             }
 
-            var result = userManager.Authenticate(username, password);
-            switch (result)
+            if (userManager.Authenticate(username!, password!))
             {
-                case LoginStatus.Success:
-                    Console.WriteLine($"Hello {username}, welcome to the To-Do List Login System!");
-                    return true;
-
-                case LoginStatus.UserNotFound:
-                    Console.WriteLine("Username not found.");
-                    return false;
-
-                case LoginStatus.WrongPassword:
-                    Console.WriteLine("Your password is incorrect.");
-                    return false;
+                currentUser = username;
+                return true;
             }
-
             return false;
         }
 
+        static void Register()
+        {
+            Console.Write("New Username: ");
+            string? username = Console.ReadLine();
+
+            Console.Write("New Password: ");
+            string? password = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                Console.WriteLine("Username and Password cannot be empty.");
+                return;
+            }
+
+            if (userManager.Register(username!, password!))
+                Console.WriteLine("Registration successful!");
+            else
+                Console.WriteLine("Username exists. Try again.");
+        }
 
         static void ShowMenu()
         {
             while (true)
             {
-                Console.WriteLine("\nChoices: ");
-                Console.WriteLine("1. View Tasks\n2. Add Task\n3. Edit Task\n4. Delete Task\n5. Mark as Done\n6. Search Task\n7. Exit");
-                Console.Write("Choose a number: ");
+                Console.WriteLine("\nChoose an option:");
+                Console.WriteLine("1. View Tasks");
+                Console.WriteLine("2. Add Task");
+                Console.WriteLine("3. Edit Task");
+                Console.WriteLine("4. Delete Task");
+                Console.WriteLine("5. Mark as Done");
+                Console.WriteLine("6. Search Tasks");
+                Console.WriteLine("7. Logout");
+                Console.Write("Your choice: ");
+                string? choice = Console.ReadLine();
 
-                switch (Console.ReadLine())
+                switch (choice)
                 {
                     case "1": DisplayTasks(); break;
                     case "2": AddTask(); break;
@@ -74,93 +109,181 @@ namespace ToDoListLoginSystem
                     case "4": DeleteTask(); break;
                     case "5": MarkAsDone(); break;
                     case "6": SearchTask(); break;
-                    case "7":
-                        Console.WriteLine("Thank you for using the To-Do List System!");
-                        return;
-                    default:
-                        Console.WriteLine("Invalid input! Please choose between 1-7.");
-                        break;
+                    case "7": currentUser = null; Console.WriteLine("Logged out."); return;
+                    default: Console.WriteLine("Invalid choice."); break;
                 }
             }
         }
 
         static void DisplayTasks()
         {
-            var tasks = toDoList.GetTasks();
-            Console.WriteLine(tasks.Count == 0 ? "No tasks available! Add one to get started." : "Your Current Tasks:");
-            for (int i = 0; i < tasks.Count; i++)
-                Console.WriteLine($"{i + 1}. {tasks[i]}");
+            if (currentUser == null)
+            {
+                Console.WriteLine("No user logged in.");
+                return;
+            }
+            var tasks = toDoList.GetTasks(currentUser);
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No tasks found.");
+            }
+            else
+            {
+                int i = 1;
+                foreach (var task in tasks)
+                {
+                    Console.WriteLine($"{i}. {task}");
+                    i++;
+                }
+            }
         }
 
         static void AddTask()
         {
-            Console.Write("Enter Task: ");
-            string? taskDescription = Console.ReadLine();
-            if (string.IsNullOrEmpty(taskDescription))
+            if (currentUser == null)
+            {
+                Console.WriteLine("No user logged in.");
+                return;
+            }
+            Console.Write("Enter task description: ");
+            string? desc = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(desc))
             {
                 Console.WriteLine("Task description cannot be empty.");
                 return;
             }
-            toDoList.AddTask(taskDescription);
-            Console.WriteLine("Task added successfully.");
+            toDoList.AddTask(currentUser, desc);
+            Console.WriteLine("Task added.");
         }
 
         static void EditTask()
         {
-            DisplayTasks();
-            Console.Write("Enter Task Number to Edit: ");
-            if (int.TryParse(Console.ReadLine(), out int index))
+            if (currentUser == null)
             {
-                index -= 1;
-                Console.Write("Enter new task description: ");
-                string? newDescription = Console.ReadLine();
-                if (string.IsNullOrEmpty(newDescription))
+                Console.WriteLine("No user logged in.");
+                return;
+            }
+            DisplayTasks();
+            Console.Write("Enter task number to edit: ");
+            string? input = Console.ReadLine();
+
+            if (int.TryParse(input, out int index))
+            {
+                var tasks = toDoList.GetTasks(currentUser);
+                if (index < 1 || index > tasks.Count)
                 {
-                    Console.WriteLine("New task description cannot be empty.");
+                    Console.WriteLine("Invalid task number.");
                     return;
                 }
-                Console.WriteLine(toDoList.EditTask(index, newDescription) ? "Task updated successfully!" : "Failed to update task.");
+                Console.Write("New description: ");
+                string? newDesc = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(newDesc))
+                {
+                    Console.WriteLine("Description cannot be empty.");
+                    return;
+                }
+                if (toDoList.EditTask(index - 1, newDesc, currentUser))
+                    Console.WriteLine("Updated successfully.");
+                else
+                    Console.WriteLine("Failed to update.");
             }
-            else Console.WriteLine("Invalid input.");
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
         }
 
         static void DeleteTask()
         {
-            DisplayTasks();
-            Console.Write("Enter Task Number to Delete: ");
-            if (int.TryParse(Console.ReadLine(), out int index))
+            if (currentUser == null)
             {
-                index -= 1;
-                Console.WriteLine(toDoList.DeleteTask(index) ? "Task deleted successfully!" : "Failed to delete task.");
+                Console.WriteLine("No user logged in.");
+                return;
             }
-            else Console.WriteLine("Invalid input.");
+            DisplayTasks();
+            Console.Write("Enter task number to delete: ");
+            string? input = Console.ReadLine();
+
+            if (int.TryParse(input, out int index))
+            {
+                var tasks = toDoList.GetTasks(currentUser);
+                if (index < 1 || index > tasks.Count)
+                {
+                    Console.WriteLine("Invalid task number.");
+                    return;
+                }
+                if (toDoList.DeleteTask(index - 1, currentUser))
+                    Console.WriteLine("Deleted successfully.");
+                else
+                    Console.WriteLine("Failed to delete.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
         }
 
         static void MarkAsDone()
         {
-            DisplayTasks();
-            Console.Write("Enter Task Number to Mark as Done: ");
-            if (int.TryParse(Console.ReadLine(), out int index))
+            if (currentUser == null)
             {
-                index -= 1;
-                Console.WriteLine(toDoList.MarkAsDone(index) ? "√ Task marked as done." : "Failed to mark task as done.");
+                Console.WriteLine("No user logged in.");
+                return;
             }
-            else Console.WriteLine("Invalid input.");
+            DisplayTasks();
+            Console.Write("Enter task number to mark as done: ");
+            string? input = Console.ReadLine();
+
+            if (int.TryParse(input, out int index))
+            {
+                var tasks = toDoList.GetTasks(currentUser);
+                if (index < 1 || index > tasks.Count)
+                {
+                    Console.WriteLine("Invalid task number.");
+                    return;
+                }
+                if (toDoList.MarkAsDone(index - 1, currentUser))
+                    Console.WriteLine("Marked as done.");
+                else
+                    Console.WriteLine("Failed to mark as done.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
         }
 
         static void SearchTask()
         {
-            Console.Write("Enter keyword to search for a task: ");
-            string? keyword = Console.ReadLine();
-            if (string.IsNullOrEmpty(keyword))
+            if (currentUser == null)
             {
-                Console.WriteLine("Search keyword cannot be empty.");
+                Console.WriteLine("No user logged in.");
                 return;
             }
-            var tasks = toDoList.SearchTasks(keyword);
-            if (tasks.Count > 0)
-                foreach (var task in tasks) Console.WriteLine(task);
-            else Console.WriteLine("No tasks found matching the keyword.");
+            Console.Write("Enter keyword: ");
+            string? keyword = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                Console.WriteLine("Keyword cannot be empty.");
+                return;
+            }
+
+            var results = toDoList.SearchTasks(keyword, currentUser);
+            if (results.Count > 0)
+            {
+                Console.WriteLine("Search results:");
+                int i = 1;
+                foreach (var task in results)
+                {
+                    Console.WriteLine($"{i}. {task}");
+                    i++;
+                }
+            }
+            else
+            {
+                Console.WriteLine("No tasks found.");
+            }
         }
     }
 }

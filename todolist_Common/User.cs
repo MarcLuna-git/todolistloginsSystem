@@ -10,5 +10,7 @@
             Username = username;
             Password = password;
         }
+
+        public User() { }
     }
 }

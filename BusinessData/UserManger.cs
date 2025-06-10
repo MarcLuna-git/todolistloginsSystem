@@ -12,16 +12,25 @@ namespace ToDoListProcess.BL
             new User("Luna", "0924")
         };
 
-        public LoginStatus Authenticate(string username, string password)
+        public bool Authenticate(string username, string password)
         {
-            var user = users.Find(u => u.Username == username);
-            if (user == null)
-                return LoginStatus.UserNotFound;
+            foreach (var user in users)
+            {
+                if (user.Username == username && user.Password == password)
+                    return true;
+            }
+            return false;
+        }
 
-            if (user.Password != password)
-                return LoginStatus.WrongPassword;
-
-            return LoginStatus.Success;
+        public bool Register(string username, string password)
+        {
+            foreach (var user in users)
+            {
+                if (user.Username == username)
+                    return false; // username exists
+            }
+            users.Add(new User(username, password));
+            return true;
         }
     }
 }

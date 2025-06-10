@@ -7,7 +7,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\datalogictask\todolist_DataLogic.csproj" />
-		<ProjectReference Include="..\todolist_Common\todolist_Common.csproj" />
 	</ItemGroup>
 
 </Project>

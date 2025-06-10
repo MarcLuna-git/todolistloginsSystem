@@ -9,89 +9,118 @@ namespace ToDoListProcess.DL
     {
         private readonly string filePath = "tasks.txt";
 
-        public List<TaskItem> GetAllTasks()
+        public List<TaskItem> GetAllTasks(string user)
         {
-            List<TaskItem> tasks = new List<TaskItem>();
+            var tasks = new List<TaskItem>();
             if (File.Exists(filePath))
             {
                 var lines = File.ReadAllLines(filePath);
                 foreach (var line in lines)
                 {
                     var parts = line.Split('|');
-                    if (parts.Length == 2)
+                    if (parts.Length == 3)
                     {
-                        tasks.Add(new TaskItem(parts[0])
+                        var taskUser = parts[0];
+                        var taskDescription = parts[1];
+                        if (DateTime.TryParse(parts[2], out DateTime dateTime))
                         {
-                            DateAndTime = DateTime.Parse(parts[1])
-                        });
+                            if (taskUser.Equals(user, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var taskItem = new TaskItem(taskUser, taskDescription, dateTime);
+                                tasks.Add(taskItem);
+                            }
+                        }
                     }
                 }
             }
             return tasks;
         }
 
-        public void AddTask(string taskDescription)
+        public void AddTask(string user, string taskDescription)
         {
-            File.AppendAllText(filePath, taskDescription + "|" + DateTime.Now + Environment.NewLine);
+            var line = $"{user}|{taskDescription}|{DateTime.Now}";
+            File.AppendAllText(filePath, line + Environment.NewLine);
         }
 
-        public bool EditTask(int index, string newDescription)
+        public bool EditTask(int index, string newDescription, string user)
         {
-            var tasks = GetAllTasks();
+            var tasks = GetAllTasks(user);
             if (index >= 0 && index < tasks.Count)
             {
-                tasks[index].Task = newDescription;
-                SaveAllTasks(tasks);
+                tasks[index].Task = newDescription; 
+                SaveAllTasks(tasks, user);
                 return true;
             }
             return false;
         }
-
-        public bool DeleteTask(int index)
+        public bool DeleteTask(int index, string user)
         {
-            var tasks = GetAllTasks();
+            var tasks = GetAllTasks(user);
             if (index >= 0 && index < tasks.Count)
             {
                 tasks.RemoveAt(index);
-                SaveAllTasks(tasks);
+                SaveAllTasks(tasks, user);
                 return true;
             }
             return false;
         }
 
-        public bool MarkAsDone(int index)
+        public bool MarkAsDone(int index, string user)
         {
-            var tasks = GetAllTasks();
+            var tasks = GetAllTasks(user);
             if (index >= 0 && index < tasks.Count)
             {
-                tasks[index].Task = "[\u221A] " + tasks[index].Task;
-                SaveAllTasks(tasks);
+                var task = tasks[index];
+                if (!task.Task.StartsWith("√ "))
+                {
+                    task.Task = "√ " + task.Task;
+                }
+                SaveAllTasks(tasks, user);
                 return true;
             }
             return false;
         }
 
-        public List<TaskItem> SearchTasks(string keyword)
+        public List<TaskItem> SearchTasks(string keyword, string user)
         {
-            List<TaskItem> result = new List<TaskItem>();
-            foreach (var task in GetAllTasks())
+            var results = new List<TaskItem>();
+            foreach (var task in GetAllTasks(user))
             {
-                if (task.Task.ToLower().Contains(keyword.ToLower()))
+                if (task.Task.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
-                    result.Add(task);
+                    results.Add(task);
                 }
             }
-            return result;
+            return results;
         }
 
-        private void SaveAllTasks(List<TaskItem> tasks)
+        private void SaveAllTasks(List<TaskItem> tasks, string user)
         {
-            List<string> lines = new List<string>();
+            // Read all existing lines to preserve other users' tasks
+            var existingLines = File.Exists(filePath) ? File.ReadAllLines(filePath) : Array.Empty<string>();
+            var newLines = new List<string>();
+
+            foreach (var line in existingLines)
+            {
+                var parts = line.Split('|');
+                if (parts.Length == 3 && parts[0].Equals(user, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Skip existing tasks for this user, as we'll rewrite them
+                }
+                else
+                {
+                    newLines.Add(line);
+                }
+            }
+
+            // Add tasks for the current user
             foreach (var task in tasks)
             {
-                lines.Add(task.Task + "|" + task.DateAndTime);
+                newLines.Add($"{task.User}|{task.Task}|{task.DateAndTime}");
             }
-            File.WriteAllLines(filePath, lines);
+
+            // Write back all lines
+            File.WriteAllLines(filePath, newLines);
         }
     }
 }

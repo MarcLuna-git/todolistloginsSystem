@@ -1,16 +1,13 @@
-﻿using System;
-
-namespace ToDoListProcess.Common
+﻿public class TaskItem
 {
-    public class TaskItem
-    {
-        public string Task { get; set; }
-        public DateTime DateAndTime { get; set; }
+    public string User { get; }
+    public string Task { get; set; } // changed from init to set
+    public DateTime DateAndTime { get; }
 
-        public TaskItem(string task)
-        {
-            Task = task;
-            DateAndTime = DateTime.Now;
-        }
+    public TaskItem(string user, string task, DateTime dateAndTime)
+    {
+        User = user;
+        Task = task;
+        DateAndTime = dateAndTime;
     }
 }

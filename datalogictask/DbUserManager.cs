@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
@@ -9,7 +9,7 @@ namespace ToDoListProcess.DL
     public class DbUserManager
     {
         private static string connectionString =
-            "Data Source=DESKTOP-53PHH4Q;Initial Catalog=DBTaskData;Integrated Security=True;TrustServerCertificate=True;";
+            "Data Source=DESKTOP-53PHH4Q;Initial Catalog=DbTaskData;Integrated Security=True;TrustServerCertificate=True;";
 
         private readonly SqlConnection sqlConnection;
 
@@ -17,8 +17,6 @@ namespace ToDoListProcess.DL
         {
             sqlConnection = new SqlConnection(connectionString);
         }
-
-        
         public List<string> GetAllUsers()
         {
             var users = new List<string>();
