@@ -10,7 +10,6 @@ namespace ToDoListUI
     {
         static string? currentUser = null;
 
-        // Change to your preferred data layer implementation
         static readonly ITaskData taskData = new JsonFileTask();
         static readonly ToDoListManager toDoList = new(taskData);
         static readonly UserManager userManager = new();

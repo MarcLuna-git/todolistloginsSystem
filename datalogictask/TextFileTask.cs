@@ -96,7 +96,7 @@ namespace ToDoListProcess.DL
 
         private void SaveAllTasks(List<TaskItem> tasks, string user)
         {
-            // Read all existing lines to preserve other users' tasks
+            
             var existingLines = File.Exists(filePath) ? File.ReadAllLines(filePath) : Array.Empty<string>();
             var newLines = new List<string>();
 
@@ -105,7 +105,7 @@ namespace ToDoListProcess.DL
                 var parts = line.Split('|');
                 if (parts.Length == 3 && parts[0].Equals(user, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Skip existing tasks for this user, as we'll rewrite them
+                    
                 }
                 else
                 {
@@ -113,13 +113,11 @@ namespace ToDoListProcess.DL
                 }
             }
 
-            // Add tasks for the current user
             foreach (var task in tasks)
             {
                 newLines.Add($"{task.User}|{task.Task}|{task.DateAndTime}");
             }
 
-            // Write back all lines
             File.WriteAllLines(filePath, newLines);
         }
     }

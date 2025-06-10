@@ -1,7 +1,7 @@
 ﻿public class TaskItem
 {
     public string User { get; }
-    public string Task { get; set; } // changed from init to set
+    public string Task { get; set; } 
     public DateTime DateAndTime { get; }
 
     public TaskItem(string user, string task, DateTime dateAndTime)

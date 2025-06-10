@@ -33,11 +33,10 @@ namespace ToDoListProcess.DL
             if (index >= 0 && index < userTasks.Count)
             {
                 var taskToEdit = userTasks[index];
-                // Gamitin ang index mula sa original list para mapalitan ang task
+                
                 int originalIndex = tasks.IndexOf(taskToEdit);
                 if (originalIndex != -1)
                 {
-                    // Gumawa ng bagong task at palitan sa list
                     var updatedTask = new TaskItem(user, newDescription, tasks[originalIndex].DateAndTime);
                     tasks[originalIndex] = updatedTask;
                     return true;

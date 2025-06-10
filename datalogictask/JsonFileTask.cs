@@ -33,7 +33,6 @@ namespace ToDoListProcess.Data
         public void AddTask(string user, string taskDescription)
         {
             var tasks = LoadAllTasks();
-            // Assuming constructor is TaskItem(string user, string task, DateTime dateAndTime)
             tasks.Add(new TaskItem(user, taskDescription, DateTime.Now));
             SaveAllTasks(tasks);
         }
