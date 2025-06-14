@@ -1,8 +1,10 @@
-﻿public class TaskItem
+﻿using System;
+
+public class TaskItem
 {
-    public string User { get; }
-    public string Task { get; set; } 
-    public DateTime DateAndTime { get; }
+    public string User { get; set; }
+    public string Task { get; set; }
+    public DateTime DateAndTime { get; set; }
 
     public TaskItem(string user, string task, DateTime dateAndTime)
     {
@@ -10,4 +12,6 @@
         Task = task;
         DateAndTime = dateAndTime;
     }
+
+    public TaskItem() { }
 }

@@ -1,90 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ToDoListProcess.Common;
 
 namespace ToDoListProcess.DL
 {
     public class InMemoryTask : ITaskData
     {
-        private readonly List<TaskItem> tasks = new();
+        private List<TaskItem> tasks = new List<TaskItem>();
 
-        public List<TaskItem> GetAllTasks(string user)
+        public List<User> Users = new List<User>
         {
-            var userTasks = new List<TaskItem>();
-            foreach (var task in tasks)
+            new User("Marc", "1234"),
+            new User("Laurence", "2004"),
+            new User("Luna", "0924")
+        };
+
+        public List<TaskItem> GetAllTasks(string username)
+        {
+            List<TaskItem> result = new List<TaskItem>();
+
+            foreach (TaskItem task in tasks)
             {
-                if (task.User == user)
+                if (task.User == username)
                 {
-                    userTasks.Add(task);
+                    result.Add(task);
                 }
             }
-            return userTasks;
+
+            return result;
         }
 
-        public void AddTask(string user, string taskDescription)
+        public void AddTask(string username, string description)
         {
-            tasks.Add(new TaskItem(user, taskDescription, DateTime.Now));
+            tasks.Add(new TaskItem(username, description, DateTime.Now));
         }
 
-        public bool EditTask(int index, string newDescription, string user)
+        public bool EditTask(int index, string newDescription, string username)
         {
-            var userTasks = GetAllTasks(user);
+            List<TaskItem> userTasks = GetAllTasks(username);
+
             if (index >= 0 && index < userTasks.Count)
             {
-                var taskToEdit = userTasks[index];
-                
-                int originalIndex = tasks.IndexOf(taskToEdit);
-                if (originalIndex != -1)
+                TaskItem oldTask = userTasks[index];
+                int realIndex = tasks.IndexOf(oldTask);
+
+                if (realIndex >= 0)
                 {
-                    var updatedTask = new TaskItem(user, newDescription, tasks[originalIndex].DateAndTime);
-                    tasks[originalIndex] = updatedTask;
+                    TaskItem newTask = new TaskItem(username, newDescription, oldTask.DateAndTime);
+                    tasks[realIndex] = newTask;
                     return true;
                 }
             }
+
             return false;
         }
 
-        public bool DeleteTask(int index, string user)
+        public bool DeleteTask(int index, string username)
         {
-            var userTasks = GetAllTasks(user);
+            List<TaskItem> userTasks = GetAllTasks(username);
+
             if (index >= 0 && index < userTasks.Count)
             {
-                var taskToRemove = userTasks[index];
-                tasks.Remove(taskToRemove);
+                tasks.Remove(userTasks[index]);
                 return true;
             }
+
             return false;
         }
 
-        public bool MarkAsDone(int index, string user)
+        public bool MarkAsDone(int index, string username)
         {
-            var userTasks = GetAllTasks(user);
+            List<TaskItem> userTasks = GetAllTasks(username);
+
             if (index >= 0 && index < userTasks.Count)
             {
-                var task = userTasks[index];
-                int originalIndex = tasks.IndexOf(task);
-                if (originalIndex != -1 && !tasks[originalIndex].Task.StartsWith("[√] "))
+                TaskItem oldTask = userTasks[index];
+                int realIndex = tasks.IndexOf(oldTask);
+
+                if (realIndex >= 0 && !tasks[realIndex].Task.StartsWith("[√] "))
                 {
-                    var completedTask = new TaskItem(user, "[√] " + task.Task, task.DateAndTime);
-                    tasks[originalIndex] = completedTask;
+                    TaskItem newTask = new TaskItem(username, "[√] " + oldTask.Task, oldTask.DateAndTime);
+                    tasks[realIndex] = newTask;
+                    return true;
                 }
-                return true;
             }
+
             return false;
         }
 
-        public List<TaskItem> SearchTasks(string keyword, string user)
+        public List<TaskItem> SearchTasks(string keyword, string username)
         {
-            var results = new List<TaskItem>();
-            foreach (var task in tasks)
+            List<TaskItem> result = new List<TaskItem>();
+
+            foreach (TaskItem task in tasks)
             {
-                if (task.User == user && task.Task.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (task.User == username && task.Task.ToLower().Contains(keyword.ToLower()))
                 {
-                    results.Add(task);
+                    result.Add(task);
                 }
             }
-            return results;
+
+            return result;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using ToDoListProcess.Common;
 
-namespace ToDoListProcess.Common
+namespace ToDoListProcess.DL
 {
     public interface ITaskData
     {

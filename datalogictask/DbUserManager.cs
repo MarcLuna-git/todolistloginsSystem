@@ -1,39 +1,47 @@
-﻿    using System;
-using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
-using ToDoListProcess.Common;
+﻿using Microsoft.Data.SqlClient;
 
-namespace ToDoListProcess.DL
+public class DbUserManager
 {
-    public class DbUserManager
+    string connectionString = "Data Source=DESKTOP-53PHH4Q;Initial Catalog=DbTaskData;Integrated Security=True;TrustServerCertificate=True;";
+
+    public bool Authenticate(string username, string password)
     {
-        private static string connectionString =
-            "Data Source=DESKTOP-53PHH4Q;Initial Catalog=DbTaskData;Integrated Security=True;TrustServerCertificate=True;";
+        string query = "SELECT COUNT(*) FROM Users WHERE Username=@Username AND Password=@Password";
 
-        private readonly SqlConnection sqlConnection;
-
-        public DbUserManager()
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        using (SqlCommand cmd = new SqlCommand(query, conn))
         {
-            sqlConnection = new SqlConnection(connectionString);
+            cmd.Parameters.AddWithValue("@Username", username);
+            cmd.Parameters.AddWithValue("@Password", password);
+            conn.Open();
+            int count = (int)cmd.ExecuteScalar();
+            return count > 0;
         }
-        public List<string> GetAllUsers()
+    }
+
+    public bool Register(string username, string password)
+    {
+        string checkQuery = "SELECT COUNT(*) FROM Users WHERE Username = @Username";
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
         {
-            var users = new List<string>();
-            string selectStatement = "SELECT Username FROM Users"; 
+            checkCmd.Parameters.AddWithValue("@Username", username);
+            conn.Open();
+            int exists = (int)checkCmd.ExecuteScalar();
 
-            SqlCommand command = new SqlCommand(selectStatement, sqlConnection);
-            sqlConnection.Open();
-            SqlDataReader reader = command.ExecuteReader();
+            if (exists > 0)
+                return false;
 
-            while (reader.Read())
+            string insertQuery = "INSERT INTO Users (Username, Password) VALUES (@Username, @Password)";
+            using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
             {
-                users.Add(reader["Username"].ToString());
+                insertCmd.Parameters.AddWithValue("@Username", username);
+                insertCmd.Parameters.AddWithValue("@Password", password);
+                insertCmd.ExecuteNonQuery();
+                return true;
             }
-
-            sqlConnection.Close();
-            return users;
         }
-
     }
 }
+
+// Magrereference lang sya pag kinall nya yung database kaya sya kailangan

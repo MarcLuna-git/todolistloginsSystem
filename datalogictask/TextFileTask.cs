@@ -7,118 +7,128 @@ namespace ToDoListProcess.DL
 {
     public class TextFileTask : ITaskData
     {
-        private readonly string filePath = "tasks.txt";
+        private string filePath = "tasks.txt";
 
         public List<TaskItem> GetAllTasks(string user)
         {
-            var tasks = new List<TaskItem>();
+            List<TaskItem> tasks = new List<TaskItem>();
+
             if (File.Exists(filePath))
             {
-                var lines = File.ReadAllLines(filePath);
-                foreach (var line in lines)
+                string[] lines = File.ReadAllLines(filePath);
+
+                foreach (string line in lines)
                 {
-                    var parts = line.Split('|');
+                    string[] parts = line.Split('|');
+
                     if (parts.Length == 3)
                     {
-                        var taskUser = parts[0];
-                        var taskDescription = parts[1];
-                        if (DateTime.TryParse(parts[2], out DateTime dateTime))
+                        string taskUser = parts[0];
+                        string taskText = parts[1];
+                        DateTime date;
+
+                        if (DateTime.TryParse(parts[2], out date))
                         {
-                            if (taskUser.Equals(user, StringComparison.OrdinalIgnoreCase))
+                            if (taskUser == user)
                             {
-                                var taskItem = new TaskItem(taskUser, taskDescription, dateTime);
-                                tasks.Add(taskItem);
+                                tasks.Add(new TaskItem(taskUser, taskText, date));
                             }
                         }
                     }
                 }
             }
+
             return tasks;
         }
 
         public void AddTask(string user, string taskDescription)
         {
-            var line = $"{user}|{taskDescription}|{DateTime.Now}";
-            File.AppendAllText(filePath, line + Environment.NewLine);
+            string line = user + "|" + taskDescription + "|" + DateTime.Now.ToString();
+            File.AppendAllText(filePath, line + "\n");
         }
 
         public bool EditTask(int index, string newDescription, string user)
         {
-            var tasks = GetAllTasks(user);
+            List<TaskItem> tasks = GetAllTasks(user);
+
             if (index >= 0 && index < tasks.Count)
             {
-                tasks[index].Task = newDescription; 
+                tasks[index].Task = newDescription;
                 SaveAllTasks(tasks, user);
                 return true;
             }
+
             return false;
         }
+
         public bool DeleteTask(int index, string user)
         {
-            var tasks = GetAllTasks(user);
+            List<TaskItem> tasks = GetAllTasks(user);
+
             if (index >= 0 && index < tasks.Count)
             {
                 tasks.RemoveAt(index);
                 SaveAllTasks(tasks, user);
                 return true;
             }
+
             return false;
         }
 
         public bool MarkAsDone(int index, string user)
         {
-            var tasks = GetAllTasks(user);
+            List<TaskItem> tasks = GetAllTasks(user);
+
             if (index >= 0 && index < tasks.Count)
             {
-                var task = tasks[index];
-                if (!task.Task.StartsWith("√ "))
+                if (!tasks[index].Task.StartsWith("[√] "))
                 {
-                    task.Task = "√ " + task.Task;
+                    tasks[index].Task = "[√] " + tasks[index].Task;
+                    SaveAllTasks(tasks, user);
                 }
-                SaveAllTasks(tasks, user);
                 return true;
             }
+
             return false;
         }
 
         public List<TaskItem> SearchTasks(string keyword, string user)
         {
-            var results = new List<TaskItem>();
-            foreach (var task in GetAllTasks(user))
+            List<TaskItem> found = new List<TaskItem>();
+
+            foreach (TaskItem task in GetAllTasks(user))
             {
-                if (task.Task.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                if (task.Task.ToLower().Contains(keyword.ToLower()))
                 {
-                    results.Add(task);
+                    found.Add(task);
                 }
             }
-            return results;
+
+            return found;
         }
 
         private void SaveAllTasks(List<TaskItem> tasks, string user)
         {
-            
-            var existingLines = File.Exists(filePath) ? File.ReadAllLines(filePath) : Array.Empty<string>();
-            var newLines = new List<string>();
+            List<string> lines = new List<string>();
 
-            foreach (var line in existingLines)
+            if (File.Exists(filePath))
             {
-                var parts = line.Split('|');
-                if (parts.Length == 3 && parts[0].Equals(user, StringComparison.OrdinalIgnoreCase))
+                string[] existingLines = File.ReadAllLines(filePath);
+                foreach (string line in existingLines)
                 {
-                    
-                }
-                else
-                {
-                    newLines.Add(line);
+                    if (!line.StartsWith(user + "|"))
+                    {
+                        lines.Add(line);
+                    }
                 }
             }
 
-            foreach (var task in tasks)
+            foreach (TaskItem task in tasks)
             {
-                newLines.Add($"{task.User}|{task.Task}|{task.DateAndTime}");
+                lines.Add(task.User + "|" + task.Task + "|" + task.DateAndTime);
             }
 
-            File.WriteAllLines(filePath, newLines);
+            File.WriteAllLines(filePath, lines);
         }
     }
 }

@@ -1,52 +1,62 @@
 ﻿using System.Collections.Generic;
 using ToDoListProcess.Common;
+using ToDoListProcess.DL;
 
 namespace ToDoListProcess.Business
 {
-    public class ToDoListManager(ITaskData taskData)
+    public class ToDoListManager
     {
-        private readonly ITaskData _taskData = taskData;
+        private ITaskData taskData;
+
+        public ToDoListManager(ITaskData taskData)
+        {
+            this.taskData = taskData;
+        }
 
         public List<string> GetTasks(string username)
         {
-            var tasks = _taskData.GetAllTasks(username); 
-            var list = new List<string>();
-            foreach (var task in tasks)
+            List<TaskItem> tasks = taskData.GetAllTasks(username);
+            List<string> result = new List<string>();
+
+            foreach (TaskItem task in tasks)
             {
-                list.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
+                result.Add(task.Task + " " + task.DateAndTime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
-            return list;
+
+            return result;
         }
 
-        public void AddTask(string user, string taskDescription)
+        public void AddTask(string username, string description)
         {
-            _taskData.AddTask(user, taskDescription);
+            taskData.AddTask(username, description);
         }
 
         public bool EditTask(int index, string newDescription, string username)
         {
-            return _taskData.EditTask(index, newDescription, username);
+            return taskData.EditTask(index, newDescription, username);
         }
 
         public bool DeleteTask(int index, string username)
         {
-            return _taskData.DeleteTask(index, username);
+            return taskData.DeleteTask(index, username);
         }
 
         public bool MarkAsDone(int index, string username)
         {
-            return _taskData.MarkAsDone(index, username);
+            return taskData.MarkAsDone(index, username);
         }
 
         public List<string> SearchTasks(string keyword, string username)
         {
-            var tasks = _taskData.SearchTasks(keyword, username);
-            var list = new List<string>();
-            foreach (var task in tasks)
+            List<TaskItem> tasks = taskData.SearchTasks(keyword, username);
+            List<string> result = new List<string>();
+
+            foreach (TaskItem task in tasks)
             {
-                list.Add($"{task.Task} {task.DateAndTime:yyyy-MM-dd HH:mm:ss}");
+                result.Add(task.Task + " " + task.DateAndTime.ToString("yyyy-MM-dd HH:mm:ss"));
             }
-            return list;
+
+            return result;
         }
     }
 }
